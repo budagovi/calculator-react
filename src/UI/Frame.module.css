@@ -1,0 +1,13 @@
+.frame {
+  height: 500px;
+  width: min(320px, 100%);
+  padding: 5px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background-color: #f3f3f3;
+  border: 1px solid #f8f8f8;
+  border-radius: 3px;
+  box-sizing: content-box;
+  box-shadow: 2px 2px 5px rgb(165, 165, 165);
+}

@@ -1,0 +1,30 @@
+.btn {
+  max-height: 49px;
+  padding: 0.7em 1em;
+  border-radius: 5px;
+  border: none;
+  box-shadow: 0px 1px 1px lightgray;
+  font-size: 17px;
+  background-color: #f9f9f9;
+  border: 1px solid #e5e5e5;
+}
+
+.btn:focus, .btn:hover {
+  background-color: #f5f5f5;
+}
+
+[id^="num"] {
+  background-color: #fff;
+}
+
+[id^="num"]:focus, [id^="num"]:hover {
+  background-color: #f4f4f4;
+}
+
+[id^="EQUAL"] {
+  background-color: #5babfb;
+  color: #e7f3fe;
+}
+[id^="EQUAL"]:focus, [id^="EQUAL"]:hover {
+  background-color: #6eb7ff;
+}
