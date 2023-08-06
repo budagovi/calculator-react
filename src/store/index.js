@@ -7,190 +7,234 @@ const outputChecker = (num) => {
   else return num
 }
 
+const evaluate = (num1, num2, operator) => {
+
+  console.log('evaluated');
+  console.log(num1, num2);
+
+  if (num2 === 0 && operator === '÷')
+    return 'ERROR';
+
+  switch (operator) {
+    case '÷':
+      return num1 / num2;
+    case '×':
+      return num1 * num2;
+    case '+':
+      return num1 + num2;
+    case '-':
+      return num1 - num2;
+  }
+}
+
 const outputSlice = createSlice({
   name: 'output',
   initialState: {
     prevOperand: null,
-    prevSecOperand: null,
     operator: null,
-    currOperand: 0,
+    prevSecOperand: null,
+    evaluated: false,
+    currOperand: '0',
     switched: false,
-    evaluated: false
+    disabled: false
   },
   reducers: {
     addDigit(state, action) {
-      if (state.currOperand.length > 8)
-        return
+
+      if (state.disabled) 
+        state.prevOperand = null;
+
+      state.disabled = false;
+
+      if (state.currOperand.length > 8 && !state.switched && !state.evaluated) 
+        return;
+
       const digit = action.payload.substr(3, 1);
-      if (state.evaluated) {
-        state.evaluated = false;
-        state.currOperand = digit;
-        state.prevOperand = null;
-        state.prevSecOperand = null;
-        state.operator = null;
-
-      }
-      else if ((state.currOperand == 0 && state.currOperand !== '0.') || state.currOperand === 'ERROR') {
+      if (state.currOperand === '0' || state.currOperand === 0 || state.switched || state.currOperand === 'ERROR') {
+        if (state.prevSecOperand)
+          state.prevSecOperand = null;
         state.currOperand = digit;
       }
-      else if (state.operator && state.switched) {
-        state.currOperand = digit;
-        state.switched = false;
-      } else {
+      else
         state.currOperand += digit;
-      }
-    },
-    removeCurrent(state) {
-      state.currOperand = 0;
 
       if (state.evaluated) {
         state.evaluated = false;
-        state.prevSecOperand = null;
         state.prevOperand = null;
+        state.prevSecOperand = null;
         state.operator = null;
+        state.currOperand = digit;
       }
-    },
-    removeAll(state) {
-      state.operator = null;
-      state.prevOperand = null;
-      state.currOperand = 0;
+
       state.switched = false;
-      state.evaluated = false;
-      state.prevSecOperand = null;
+    },
+    removeBtn(state, action) {
+      state.disabled = false;
+
+      if (state.evaluated || action.payload === 'C' || state.currOperand === 'ERROR') {
+        state.prevOperand = null;
+        state.prevSecOperand = null;
+        state.operator = null;
+        state.currOperand = '0';
+        state.switched = false;
+        state.evaluated = false;
+      }
+      else {
+        state.currOperand = '0';
+      }
     },
     backspaceBtn(state) {
-      if (state.currOperand.length === 1 || state.currOperand === 'ERROR')
-        state.currOperand = 0
-      else if (state.currOperand.length === 3 && Math.abs(state.currOperand) < 1)
-        state.currOperand = 0
-      else if (state.currOperand)
-        state.currOperand = state.currOperand.substring(0, state.currOperand.length - 1);
+      state.disabled = false;
 
-      state.evaluated = false;
+      if ((state.currOperand == 0 && state.evaluated) || state.currOperand === 'ERROR') {
+        state.prevOperand = null;
+        state.prevSecOperand = null;
+        state.operator = null;
+        state.evaluated = false;
+        state.currOperand = '0';
+        state.switched = false;
+      }
+      else if (state.currOperand.toString().length === 1 || (state.currOperand.toString().length === 2 && +state.currOperand < 0))
+        state.currOperand = '0';
+      else if (state.currOperand.toString().at(-2) === '.')
+        state.currOperand = state.currOperand.toString().slice(0, -2);
+      else
+        state.currOperand = state.currOperand.toString().slice(0, -1);
     },
     operationBtn(state, action) {
-      const id = action.payload;
-      state.prevSecOperand = null;
 
-      if (id === 'DIV')
-        state.operator = '÷';
-      else if (id === 'MUL')
-        state.operator = '×';
-      else if (id === 'PLUS')
-        state.operator = '+';
-      else if (id === 'MINUS') {
-        state.operator = '-';
-        console.log(state.currOperand)
+      if (state.operator && !state.switched && !state.evaluated) {
+        state.currOperand = evaluate(+state.prevOperand, +state.currOperand, state.operator)
       }
 
-      state.prevOperand = state.currOperand;
+      if (!state.evaluated && !state.switched) {
+        if (!state.prevOperand && state.prevSecOperand) {
+          state.prevOperand = state.prevOperand;
+          state.prevSecOperand = null;
+        }
+        state.prevOperand = state.currOperand;
+      }
+      else if (state.prevSecOperand) {
+
+      }
+      else if (state.switched) {
+        state.currOperand = evaluate(+state.prevOperand, +state.prevSecOperand, state.operator)
+        state.prevOperand = state.currOperand;
+        state.prevSecOperand = null;
+      }
+      else {
+        state.evaluated = false;
+        state.prevOperand = state.currOperand;
+        state.prevSecOperand = null;
+      }
+
+      switch (action.payload) {
+        case 'DIV':
+          state.operator = '÷'
+          break;
+        case 'MUL':
+          state.operator = '×'
+          break;
+        case 'PLUS':
+          state.operator = '+'
+          break;
+        case 'MINUS':
+          state.operator = '-'
+          break;
+      }
+
       state.switched = true;
-      state.evaluated = false;
+      state.currOperand = outputChecker(state.currOperand);
     },
     evaluationBtn(state) {
 
-      if(state.currOperand === 'ERROR')
-        return;      
-      
-      if (state.evaluated) {
-        if(state.prevSecOperand.toString().includes('/') || state.prevSecOperand.toString().includes('q')) {
-          state.prevSecOperand = +state.currOperand;
-        }
-        else {
-          state.prevOperand = state.currOperand;
-        }
-      }
-      else
-        state.prevSecOperand = state.currOperand;
-
-
-      const previous = +state.prevSecOperand;
-      const current = +state.prevOperand;
-      
-      if (state.operator === '÷') {
-        if (state.currOperand == 0) {
-          state.currOperand = 'ERROR';
-          return;
-        }
-        state.currOperand = current / previous;
-      }
-      else if (state.operator === '×')
-        state.currOperand = previous * current;
-      else if (state.operator === '+')
-        state.currOperand = previous + current;
-      else if (state.operator === '-') {
-        state.currOperand = current - previous;
-      }
-      else if (!state.evaluated)
+      state.disabled = false;
+      if (state.currOperand === 'ERROR') {
         state.prevOperand = null;
-      
-      
-      state.evaluated = true;
-      state.switched = false;
-
-      state.currOperand = outputChecker(state.currOperand);
-    },
-    fractionBtn(state) {
-      if(state.currOperand === 'ERROR')
-        return;  
-
-      if(state.evaluated) {
-        state.operator = null;
-        state.prevOperand = null;
-      }
-
-      if (state.currOperand === 0 || state.currOperand === 'ERROR')
-        state.currOperand = 'ERROR'
-      else {
-        state.prevSecOperand = `1/(${state.currOperand})`;
-        state.currOperand = 1 / state.currOperand;
-        state.currOperand = state.currOperand;
-        state.evaluated = true;
-      }
-      if (state.currOperand.length > 9)
-        state.currOperand = 'ERROR';
-
-      state.currOperand = outputChecker(state.currOperand);
-    },
-    percentBtn(state) {
-
-      if (state.evaluated) {
-        state.evaluated = false;
-        state.currOperand = 0;
-        state.prevOperand = 0;
         state.prevSecOperand = null;
         state.operator = null;
+        state.currOperand = '0';
+        state.switched = false;
+        state.evaluated = false;
+        return;
       }
-      else if (state.prevOperand == null)
-        state.prevOperand = 0;
+
+      if (state.prevSecOperand && !state.prevOperand) {
+        state.prevOperand = state.prevOperand;
+        state.prevSecOperand = null;
+      }
+
+      if (state.prevSecOperand && state.prevOperand) {
+        if (!state.evaluated) {
+          if (state.prevSecOperand.includes('/') || state.prevSecOperand.includes('q'))
+            state.prevSecOperand = state.currOperand;
+          state.currOperand = evaluate(+state.prevOperand, +state.prevSecOperand, state.operator);
+        } else {
+          state.prevOperand = state.currOperand;
+          state.currOperand = evaluate(+state.currOperand, +state.prevSecOperand, state.operator);
+        }
+      }
+      else if (state.prevOperand && !state.evaluated) {
+        state.prevSecOperand = state.currOperand;
+        state.currOperand = evaluate(+state.prevOperand, +state.currOperand, state.operator);
+      }
       else
-        state.currOperand = (state.prevOperand * state.currOperand) / 100;
+        state.prevOperand = state.currOperand;
+
+
+      state.evaluated = true;
+      if (state.currOperand === 'ERROR')
+        state.disabled = true;
+      else
+        state.currOperand = outputChecker(state.currOperand);
+    },
+    fractionBtn(state) {
+      state.switched = true;
+      state.prevSecOperand = `1/(${state.currOperand})`
+
+
+      if (state.currOperand == 0) {
+        state.currOperand = 'ERROR';
+        state.disabled = true;
+      }
+      else
+        state.currOperand = outputChecker(1 / state.currOperand);
+    },
+    percentBtn(state) {
+      state.switched = true;
+
+      if (!state.prevOperand) {
+        state.prevOperand = '0';
+        state.currOperand = '0'
+        state.prevSecOperand = null;
+      }
+      else {
+        if (state.operator === '+' || state.operator === '-') {
+          state.currOperand = state.prevOperand * state.currOperand / 100;
+          state.prevSecOperand = state.currOperand;
+        }
+        else {
+          state.currOperand = state.currOperand / 100;
+          state.prevSecOperand = state.currOperand;
+        }
+      }
     },
     squareBtn(state) {
-      if(state.currOperand === 'ERROR')
-        return;  
-
-      if(state.evaluated) {
-        state.operator = null;
-        state.prevOperand = null;
-      }
+      state.switched = true;
       state.prevSecOperand = `sqr(${state.currOperand})`;
-      state.currOperand = state.currOperand * state.currOperand;
-      state.evaluated = true;
-      state.currOperand = outputChecker(state.currOperand);
+      state.currOperand = outputChecker(Math.pow(state.currOperand, 2));
     },
     squareRootBtn(state) {
-      if(state.currOperand === 'ERROR')
-        return;  
+      state.switched = true;
+      state.prevSecOperand = `sqrt(${state.currOperand})`;
 
-      if(state.evaluated) {
-        state.operator = null;
-        state.prevOperand = null;
+
+      if (state.currOperand < 0) {
+        state.currOperand = 'ERROR';
+        state.disabled = true;
       }
-      state.prevSecOperand = `sqrt(${parseFloat((+state.currOperand).toFixed(4)).toString()})`;
-      state.currOperand = Math.sqrt(state.currOperand);
-      state.evaluated = true;
-      state.currOperand = outputChecker(state.currOperand);
+      else
+        state.currOperand = outputChecker(Math.sqrt(state.currOperand));
     },
     negativeBtn(state) {
       state.currOperand = 0 - state.currOperand;
@@ -203,7 +247,7 @@ const outputSlice = createSlice({
         state.currOperand = '0.';
         state.switched = false;
       }
-      else 
+      else
         state.currOperand += '.';
     }
   }

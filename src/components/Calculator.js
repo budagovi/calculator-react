@@ -13,7 +13,8 @@ const Calculator = () => {
   const currOperand = useSelector(state => state.currOperand);
   const prevSecOperand = useSelector(state => state.prevSecOperand);
   const operator = useSelector(state => state.operator);
-  const evaluated = useSelector(state => state.evaluated)
+  const evaluated = useSelector(state => state.evaluated);
+  const disabled = useSelector(state => state.disabled);
 
   const dispatch = useDispatch();
 
@@ -23,6 +24,10 @@ const Calculator = () => {
 
   const operationHandler = (e) => {
     dispatch(outputActions.operationBtn(e.target.id))
+  }
+
+  const removeHandler = (e) => {
+    dispatch(outputActions.removeBtn(e.target.id))
   }
 
   //ICONS
@@ -50,9 +55,8 @@ const Calculator = () => {
       <h2>Calculator:</h2>
       <div className={style.output}>
         <span className={style.prevOperand}>
-          {prevOperand} 
-          {operator} 
-          <span className={style.d}>{prevSecOperand}</span> 
+          {prevOperand} {operator} 
+          <span className={style.d}> {prevSecOperand}</span> 
           {evaluated && " ="}
         </span>
         <span className={style.currOperand}>
@@ -61,6 +65,7 @@ const Calculator = () => {
       </div>
       <div className={style.btnWrapper}>
         <Button
+          disabled={disabled}
           symbol='%'
           id={'PER'}
           onClick={() => { dispatch(outputActions.percentBtn()) }}
@@ -68,12 +73,12 @@ const Calculator = () => {
         <Button
           symbol='CE'
           id={'CE'}
-          onClick={() => { dispatch(outputActions.removeCurrent()) }}
+          onClick={removeHandler}
         />
         <Button
           symbol='C'
           id={'C'}
-          onClick={() => { dispatch(outputActions.removeAll()) }}
+          onClick={removeHandler}
         />
         <Button
           symbol={backspaceIcon}
@@ -81,21 +86,25 @@ const Calculator = () => {
           onClick={() => { dispatch(outputActions.backspaceBtn()) }}
         />
         <Button
+          disabled={disabled}
           symbol={fractionIcon}
           id={'FRAC'}
           onClick={() => { dispatch(outputActions.fractionBtn()) }}
         />
         <Button
+          disabled={disabled}
           symbol={squareIcon}
           id={'SQUARE'}
           onClick={() => { dispatch(outputActions.squareBtn()) }}
         />
         <Button
+          disabled={disabled}
           symbol={squareRootIcon}
           id={'ROOT'}
           onClick={() => { dispatch(outputActions.squareRootBtn()) }}
         />
         <Button
+          disabled={disabled}
           symbol={'÷'}
           id={'DIV'}
           onClick={operationHandler}
@@ -113,6 +122,7 @@ const Calculator = () => {
           onClick={addDigitHandler}
         />
         <Button 
+          disabled={disabled}
           symbol={'×'} 
           id={'MUL'} 
           onClick={operationHandler}
@@ -130,6 +140,7 @@ const Calculator = () => {
           onClick={addDigitHandler}
         />
         <Button 
+          disabled={disabled}
           symbol={'-'} 
           id={'MINUS'} 
           onClick={operationHandler}
@@ -147,11 +158,13 @@ const Calculator = () => {
           onClick={addDigitHandler}
         />
         <Button
+          disabled={disabled}
           symbol='+' 
           id={'PLUS'} 
           onClick={operationHandler}
         />
         <Button 
+          disabled={disabled}
           symbol={negativeIcon}
           id={'NEG'} 
           onClick={() => { dispatch(outputActions.negativeBtn()) }}
@@ -161,6 +174,7 @@ const Calculator = () => {
           onClick={addDigitHandler}
         />
         <Button 
+          disabled={disabled}
           symbol={'.'}
           id={'DOT'} 
           onClick={() => { dispatch(outputActions.dotBtn()) }}

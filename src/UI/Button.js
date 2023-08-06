@@ -1,10 +1,11 @@
 import style from './Button.module.css'
 
-const Button = ({onClick, id, symbol}) => {
+const Button = ({ onClick, id, symbol, disabled }) => {
   return (
-    <button 
-      className={style.btn} 
-      onClick={onClick} 
+    <button
+      disabled={disabled}
+      className={style.btn}
+      onClick={onClick}
       id={id}
     >
       {symbol ? symbol : id.substr(3, 1)}

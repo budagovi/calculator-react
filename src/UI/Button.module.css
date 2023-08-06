@@ -7,17 +7,24 @@
   font-size: 17px;
   background-color: #f9f9f9;
   border: 1px solid #e5e5e5;
+  cursor: pointer;
 }
 
-.btn:focus, .btn:hover {
+.btn:hover {
   background-color: #f5f5f5;
+}
+
+.btn:disabled {
+  color: #c2c2c2;
+  background-color: #f5f5f5;
+  cursor: no-drop;
 }
 
 [id^="num"] {
   background-color: #fff;
 }
 
-[id^="num"]:focus, [id^="num"]:hover {
+[id^="num"]:hover {
   background-color: #f4f4f4;
 }
 
@@ -25,6 +32,7 @@
   background-color: #5babfb;
   color: #e7f3fe;
 }
-[id^="EQUAL"]:focus, [id^="EQUAL"]:hover {
+[id^="EQUAL"]:hover {
   background-color: #6eb7ff;
 }
+
