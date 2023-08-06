@@ -119,7 +119,7 @@ const outputSlice = createSlice({
         state.prevOperand = state.currOperand;
       }
       else if (state.switched) {
-        if (state.prevSecOperand.toString().includes('/') || state.prevSecOperand.toString().includes('q')) 
+        if (state.prevSecOperand && (state.prevSecOperand.includes('/') || state.prevSecOperand.includes('q'))) 
           state.prevSecOperand = state.currOperand;
         state.currOperand = evaluate(+state.prevOperand, +state.prevSecOperand, state.operator)
         state.prevOperand = state.currOperand;
@@ -171,7 +171,7 @@ const outputSlice = createSlice({
 
       if (state.prevSecOperand && state.prevOperand) {
         if (!state.evaluated) {
-          if (state.prevSecOperand.toString().includes('/') || state.prevSecOperand.toString().includes('q')) 
+          if (state.prevSecOperand && (state.prevSecOperand.includes('/') || state.prevSecOperand.includes('q'))) 
             state.prevSecOperand = state.currOperand;
           state.currOperand = evaluate(+state.prevOperand, +state.prevSecOperand, state.operator);
         } else {
