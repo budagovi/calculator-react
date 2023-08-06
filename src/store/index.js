@@ -103,21 +103,24 @@ const outputSlice = createSlice({
     },
     operationBtn(state, action) {
 
+      if(state.currOperand.toString().at(-1) === '.') return;
+
+      if (state.prevSecOperand && !state.prevOperand) {
+        state.prevOperand = state.prevOperand;
+        state.prevSecOperand = null;
+        state.switched = false;
+      }
+
       if (state.operator && !state.switched && !state.evaluated) {
         state.currOperand = evaluate(+state.prevOperand, +state.currOperand, state.operator)
       }
 
       if (!state.evaluated && !state.switched) {
-        if (!state.prevOperand && state.prevSecOperand) {
-          state.prevOperand = state.prevOperand;
-          state.prevSecOperand = null;
-        }
         state.prevOperand = state.currOperand;
       }
-      else if (state.prevSecOperand) {
-
-      }
       else if (state.switched) {
+        if (state.prevSecOperand.toString().includes('/') || state.prevSecOperand.toString().includes('q')) 
+          state.prevSecOperand = state.currOperand;
         state.currOperand = evaluate(+state.prevOperand, +state.prevSecOperand, state.operator)
         state.prevOperand = state.currOperand;
         state.prevSecOperand = null;
@@ -148,6 +151,8 @@ const outputSlice = createSlice({
     },
     evaluationBtn(state) {
 
+      if(state.currOperand.toString().at(-1) === '.') return;
+
       state.disabled = false;
       if (state.currOperand === 'ERROR') {
         state.prevOperand = null;
@@ -166,7 +171,7 @@ const outputSlice = createSlice({
 
       if (state.prevSecOperand && state.prevOperand) {
         if (!state.evaluated) {
-          if (state.prevSecOperand.includes('/') || state.prevSecOperand.includes('q'))
+          if (state.prevSecOperand.toString().includes('/') || state.prevSecOperand.toString().includes('q')) 
             state.prevSecOperand = state.currOperand;
           state.currOperand = evaluate(+state.prevOperand, +state.prevSecOperand, state.operator);
         } else {
@@ -189,6 +194,9 @@ const outputSlice = createSlice({
         state.currOperand = outputChecker(state.currOperand);
     },
     fractionBtn(state) {
+
+      if(state.currOperand.toString().at(-1) === '.') return;
+
       state.switched = true;
       state.prevSecOperand = `1/(${state.currOperand})`
 
@@ -201,10 +209,13 @@ const outputSlice = createSlice({
         state.currOperand = outputChecker(1 / state.currOperand);
     },
     percentBtn(state) {
+
+      if(state.currOperand.toString().at(-1) === '.') return;
+
       state.switched = true;
 
       if (!state.prevOperand) {
-        state.prevOperand = '0';
+        state.prevSecOperand = '0';
         state.currOperand = '0'
         state.prevSecOperand = null;
       }
@@ -220,11 +231,15 @@ const outputSlice = createSlice({
       }
     },
     squareBtn(state) {
+      if(state.currOperand.toString().at(-1) === '.') return;
+
       state.switched = true;
       state.prevSecOperand = `sqr(${state.currOperand})`;
       state.currOperand = outputChecker(Math.pow(state.currOperand, 2));
     },
     squareRootBtn(state) {
+      if(state.currOperand.toString().at(-1) === '.') return;
+      
       state.switched = true;
       state.prevSecOperand = `sqrt(${state.currOperand})`;
 

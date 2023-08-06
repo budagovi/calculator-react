@@ -55,7 +55,8 @@ const Calculator = () => {
       <h2>Calculator:</h2>
       <div className={style.output}>
         <span className={style.prevOperand}>
-          {prevOperand} {operator} {prevSecOperand} 
+          {prevOperand} {operator} 
+          <span className={style.d}> {prevSecOperand}</span> 
           {evaluated && " ="}
         </span>
         <span className={style.currOperand}>
